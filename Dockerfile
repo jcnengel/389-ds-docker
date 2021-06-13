@@ -62,8 +62,7 @@ RUN dscreate create-template /etc/dirsrv/ds.inf && \
        -e "s/;root_password = .*/root_password = ${ROOT_PW}/g" \
        -e "s/;suffix = .*/suffix = ${BASEDN}/g" \
        -e "s/;self_sign_cert = .*/self_sign_cert = False/g" \
-       /etc/dirsrv/ds.inf && \
-    dscreate from-file /etc/dirsrv/ds.inf
+       /etc/dirsrv/ds.inf
 
 USER ${USERNAME}
 CMD ["dirsrv"]

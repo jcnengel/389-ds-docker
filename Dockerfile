@@ -55,6 +55,11 @@ ENV USERNAME dirsrv
 ENV GROUP dirsrv
 
 RUN addgroup -S ${GROUP} && adduser -S ${USERNAME} -h /etc/dirsrv -G ${GROUP}
+RUN mkdir /var/lib/dirsrv && chown ${USERNAME}.${GROUP} /var/lib/dirsrv && \
+    mkdir -p /run/lock/dirsrv && chown ${USERNAME}.${GROUP} /run/lock/dirsrv && \
+    mkdir -p /var/log/dirsrv && chown ${USERNAME}.${GROUP} /var/log/dirsrv
+
+USER ${USERNAME}
 
 RUN dscreate create-template /etc/dirsrv/ds.inf && \
     sed -i \
@@ -64,5 +69,4 @@ RUN dscreate create-template /etc/dirsrv/ds.inf && \
        -e "s/;self_sign_cert = .*/self_sign_cert = False/g" \
        /etc/dirsrv/ds.inf
 
-USER ${USERNAME}
 CMD ["ns-slapd"]

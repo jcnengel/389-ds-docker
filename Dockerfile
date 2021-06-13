@@ -3,7 +3,11 @@ LABEL maintainer="j.engel@intero-consulting.de"
 
 ENV VERSION 2.0.5
 COPY 389-ds-base-389-ds-base-${VERSION}.tar.gz /tmp/389-ds-base-${VERSION}.tar.gz
-RUN apk add build-base wget nspr-dev nss-dev openldap-dev db-dev \
+RUN apk add nspr nss openldap db cyrus-sasl icu pcre cracklib \
+    net-snmp bzip2 zlib openssl linux-pam libevent krb5 python3 \
+    nss-tools
+
+RUN apk add build-base nspr-dev nss-dev openldap-dev db-dev \
     cyrus-sasl-dev icu-dev pcre-dev cracklib-dev git \
     net-snmp-dev bzip2-dev zlib-dev openssl-dev \
     linux-pam-dev cargo rust pkgconfig autoconf automake libtool \
@@ -19,29 +23,27 @@ RUN apk add build-base wget nspr-dev nss-dev openldap-dev db-dev \
     mv 389-ds-base-389-ds-base-${VERSION} 389-ds-base && \
     cd 389-ds-base && \
     ./autogen.sh && \
-    
-   cd /tmp/389ds/BUILD && \
+    cd /tmp/389ds/BUILD && \
     CFLAGS='-g -pipe -Wall -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' \
     CXXFLAGS='-g -pipe -Wall -O2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' \
     ../389-ds-base/configure --with-openldap --with-fhs \
       --enable-gcc-security --enable-rust --disable-cockpit \
       --enable-autobind --enable-auto-dn-suffix && \
-    make -j4 install && \
+    make -j12 && \
+    make install && \
     cd /tmp/389ds/389-ds-base/src/lib389 && \
     pip3 install argparse-manpage && \
     pip3 install argcomplete && \
     python3 setup.py build && \
-    python3 setup.py install --prefix /usr && \
+    python3 setup.py install --skip-build && \
 # Remove devel packages again    
     apk del build-base nspr-dev nss-dev openldap-dev db-dev \
     cyrus-sasl-dev icu-dev pcre-dev cracklib-dev git \
     net-snmp-dev bzip2-dev zlib-dev openssl-dev \
     linux-pam-dev pkgconfig autoconf automake libtool \
     cmocka-dev libevent-dev krb5-dev py3-pip python3-dev && \
-# Re-install required libraries
-    apk add nspr nss openldap db cyrus-sasl icu pcre cracklib \
-    net-snmp bzip2 zlib openssl linux-pam libevent krb5 python3 \
-    nss-tools
+    rm -r /tmp/389ds && \
+    rm -f /tmp/389-ds-base-${VERSION}.tar.gz
 
 ENV ROOT_PW 'Secret.123'
 ENV INSTANCE_NAME localhost
@@ -56,6 +58,17 @@ RUN mkdir /var/lib/dirsrv && chown ${USERNAME}.${GROUP} /var/lib/dirsrv && \
     mkdir -p /var/run/dirsrv && chown ${USERNAME}.${GROUP} /var/run/dirsrv && \
     mkdir -p /var/log/dirsrv && chown ${USERNAME}.${GROUP} /var/log/dirsrv
 
+# Link some known static locations to point to /data
+RUN mkdir -p /data/config && \
+    mkdir -p /data/ssca && \
+    mkdir -p /data/run && \
+    mkdir -p /var/run/dirsrv && \
+    ln -s /data/config /etc/dirsrv/slapd-localhost && \
+    ln -s /data/ssca /etc/dirsrv/ssca && \
+    ln -s /data/run /var/run/dirsrv
+
+VOLUME /data
+
 USER ${USERNAME}
 
 RUN dscreate create-template /etc/dirsrv/ds.inf && \
@@ -66,4 +79,7 @@ RUN dscreate create-template /etc/dirsrv/ds.inf && \
        -e "s/;self_sign_cert = .*/self_sign_cert = False/g" \
        /etc/dirsrv/ds.inf
 
-CMD ["ns-slapd"]
+HEALTHCHECK --start-period=5m --timeout=5s --interval=5s --retries=2 \
+    CMD /usr/libexec/dirsrv/dscontainer -H
+
+CMD ["/usr/libexec/dirsrv/dscontainer", "-r"]

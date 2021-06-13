@@ -65,4 +65,4 @@ RUN dscreate create-template /etc/dirsrv/ds.inf && \
        /etc/dirsrv/ds.inf
 
 USER ${USERNAME}
-CMD ["dirsrv"]
+CMD ["ns-slapd"]

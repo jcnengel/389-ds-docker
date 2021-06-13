@@ -43,11 +43,18 @@ RUN apk del build-base nspr-dev nss-dev openldap-dev db-dev \
     cyrus-sasl-dev icu-dev pcre-dev cracklib-dev git \
     net-snmp-dev bzip2-dev zlib-dev openssl-dev \
     linux-pam-dev pkgconfig autoconf automake libtool \
-    cmocka-dev libevent-dev krb5-dev py3-pip python3-dev
+    cmocka-dev libevent-dev krb5-dev py3-pip python3-dev && \
+    apk add nspr nss openldap db cyrus-sasl icu pcre cracklib \
+    net-snmp bzip2 zlib openssl linux-pam libevent krb5 python3 \
+    nss-tools
 
-ENV ROOT_PW ''
+ENV ROOT_PW 'Secret.123'
 ENV INSTANCE_NAME localhost
 ENV BASEDN dc=example,dc=org
+ENV USERNAME dirsrv
+ENV GROUP dirsrv
+
+RUN addgroup -S ${GROUP} && adduser -S ${USERNAME} -h /etc/dirsrv -G ${GROUP}
 
 RUN dscreate create-template /etc/dirsrv/ds.inf && \
     sed -i \
@@ -58,4 +65,5 @@ RUN dscreate create-template /etc/dirsrv/ds.inf && \
        /etc/dirsrv/ds.inf && \
     dscreate from-file /etc/dirsrv/ds.inf
 
+USER ${USERNAME}
 CMD ["dirsrv"]

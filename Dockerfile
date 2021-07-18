@@ -51,35 +51,21 @@ ENV BASEDN dc=example,dc=org
 ENV USERNAME dirsrv
 ENV GROUP dirsrv
 
+VOLUME ["/etc/dirsrv", "/var/lib/dirsrv", "/var/log/dirsrv", "/certs"]
+
+# Move config to temporary location until volume is ready
+RUN mkdir /etc/dirsrv-tmpl && mv /etc/dirsrv/* /etc/dirsrv-tmpl/
+
+EXPOSE 389 636
+
 RUN addgroup -S ${GROUP} && adduser -S ${USERNAME} -h /etc/dirsrv -G ${GROUP}
-RUN mkdir /var/lib/dirsrv && chown ${USERNAME}.${GROUP} /var/lib/dirsrv && \
-    mkdir -p /var/lock/dirsrv && chown ${USERNAME}.${GROUP} /var/lock/dirsrv && \
+RUN mkdir -p /var/lock/dirsrv && chown ${USERNAME}.${GROUP} /var/lock/dirsrv && \
     mkdir -p /run/lock/dirsrv && chown ${USERNAME}.${GROUP} /run/lock/dirsrv && \
-    mkdir -p /var/run/dirsrv && chown ${USERNAME}.${GROUP} /var/run/dirsrv && \
-    mkdir -p /var/log/dirsrv && chown ${USERNAME}.${GROUP} /var/log/dirsrv
+    mkdir -p /etc/supervisor
 
-# Link some known static locations to point to /data
-RUN mkdir -p /data/config && \
-    mkdir -p /data/ssca && \
-    mkdir -p /data/run && \
-    mkdir -p /var/run/dirsrv && \
-    ln -s /data/config /etc/dirsrv/slapd-localhost && \
-    ln -s /data/ssca /etc/dirsrv/ssca && \
-    ln -s /data/run /var/run/dirsrv
+COPY supervisord.conf /etc/supervisor/supervisord.conf
+COPY run_server.sh /run_server.sh
+COPY start.sh /start.sh
+COPY dirsrv-dir /etc/systemctl/dirsrv-dir
 
-VOLUME /data
-
-USER ${USERNAME}
-
-RUN dscreate create-template /etc/dirsrv/ds.inf && \
-    sed -i \
-       -e "s/;instance_name = .*/instance_name = ${INSTANCE_NAME}/g" \
-       -e "s/;root_password = .*/root_password = ${ROOT_PW}/g" \
-       -e "s/;suffix = .*/suffix = ${BASEDN}/g" \
-       -e "s/;self_sign_cert = .*/self_sign_cert = False/g" \
-       /etc/dirsrv/ds.inf
-
-HEALTHCHECK --start-period=5m --timeout=5s --interval=5s --retries=2 \
-    CMD /usr/libexec/dirsrv/dscontainer -H
-
-CMD ["/usr/libexec/dirsrv/dscontainer", "-r"]
+CMD ["/start.sh"]

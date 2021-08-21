@@ -1,7 +1,7 @@
 FROM alpine:latest
 LABEL maintainer="j.engel@intero-consulting.de"
 
-ENV VERSION 2.0.5
+ENV VERSION 2.0.7
 COPY 389-ds-base-389-ds-base-${VERSION}.tar.gz /tmp/389-ds-base-${VERSION}.tar.gz
 RUN apk add nspr nss openldap db cyrus-sasl icu pcre cracklib \
     net-snmp bzip2 zlib openssl linux-pam libevent krb5 python3 \

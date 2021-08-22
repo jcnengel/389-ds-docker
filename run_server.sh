@@ -17,9 +17,9 @@ export BASEDN=${BASEDN:-"dc=example,dc=com"}
 #
 # housekeeping variables
 #
-BASEDIR="/etc/dirsrv/slapd-dir"
-LOGDIR="/var/log/dirsrv/slapd-dir"
-LOCKDIR="/var/lock/dirsrv/slapd-dir"
+BASEDIR="/etc/dirsrv/slapd-${INSTANCE_NAME}"
+LOGDIR="/var/log/dirsrv/slapd-${INSTANCE_NAME}"
+LOCKDIR="/var/lock/dirsrv/slapd-${INSTANCE_NAME}"
 RUNDIR="/var/run/dirsrv/"
 CERT_CA="CA certificate"
 CERT_NAME="Server-Cert"
@@ -72,7 +72,7 @@ setup_dirsrv() {
       -e "s/;suffix = .*/suffix = ${BASEDN}/g" \
       -e "s/;self_sign_cert = .*/self_sign_cert = False/g" /tmp/ds.inf
     dscreate from-file /tmp/ds.inf
-    sed -i -e "s/slapd-dir/slapd-${INSTANCE_NAME}/g" /run_server.sh
+    sed -i -e "s/slapd-${INSTANCE_NAME}/slapd-${INSTANCE_NAME}/g" /run_server.sh
     /bin/mv /certmap.conf ${BASEDIR}
 }
 
@@ -111,7 +111,7 @@ fi
 
 
 # remove stray lockfiles
-rm -f /var/lock/dirsrv/slapd-dir/server/*
+rm -f /var/lock/dirsrv/slapd-${INSTANCE_NAME}/server/*
 
 exec /usr/sbin/ns-slapd -D ${BASEDIR} -d 16384
 

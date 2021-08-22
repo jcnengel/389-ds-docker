@@ -5,7 +5,7 @@ ENV VERSION 2.0.7
 COPY 389-ds-base-389-ds-base-${VERSION}.tar.gz /tmp/389-ds-base-${VERSION}.tar.gz
 RUN apk add nspr nss openldap db cyrus-sasl icu pcre cracklib \
     net-snmp bzip2 zlib openssl linux-pam libevent krb5 python3 \
-    nss-tools supervisor
+    nss-tools supervisor openldap-clients
 
 RUN apk add build-base nspr-dev nss-dev openldap-dev db-dev \
     cyrus-sasl-dev icu-dev pcre-dev cracklib-dev git \

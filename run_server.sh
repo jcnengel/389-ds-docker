@@ -3,16 +3,16 @@
 # Register default environment
 #
 export DIR_HOSTNAME=${DIR_HOSTNAME:-$(hostname -f)}
-export DIR_ADMIN_PASSWORD=${DIR_ADMIN_PASSWORD:-${DIR_MANAGER_PASSWORD:-"Admin123"}}
+export DIR_ADMIN_PASSWORD=${DIR_ADMIN_PASSWORD:-${DIR_MANAGER_PASSWORD:-"Secret.123"}}
 export DIR_ADMIN_USERNAME=${DIR_ADMIN_USERNAME:-"bladmin"}
 export DIR_ADMIN_UID=${DIR_ADMIN_UID:-"15000"}
-export DIR_MANAGER_PASSWORD=${DIR_MANAGER_PASSWORD:-${DIR_ADMIN_PASSWORD:-"Admin123"}}
+export DIR_MANAGER_PASSWORD=${DIR_MANAGER_PASSWORD:-${DIR_ADMIN_PASSWORD:-"Secret.123"}}
 export DIR_SUFFIX=${DIR_SUFFIX:-"dc=example,dc=com"}
 export DIR_USERS_HOME=${DIR_USERS_HOME:-"/home"}
 export DIR_USERS_SHELL=${DIR_USERS_SHELL:-"/bin/sh"}
 export INSTANCE_NAME=${INSTANCE_NAME:-"localhost"}
 export ROOT_PW=${ROOT_PW:-${DIR_ADMIN_PASSWORD}}
-export BASEDN=${BASEDN:-"dc=example,dc=org"}
+export BASEDN=${BASEDN:-"dc=example,dc=com"}
 
 #
 # housekeeping variables

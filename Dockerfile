@@ -5,7 +5,7 @@ ENV VERSION 2.0.7
 COPY 389-ds-base-389-ds-base-${VERSION}.tar.gz /tmp/389-ds-base-${VERSION}.tar.gz
 RUN apk add nspr nss openldap db cyrus-sasl icu pcre cracklib \
     net-snmp bzip2 zlib openssl linux-pam libevent krb5 python3 \
-    nss-tools
+    nss-tools supervisor
 
 RUN apk add build-base nspr-dev nss-dev openldap-dev db-dev \
     cyrus-sasl-dev icu-dev pcre-dev cracklib-dev git \
@@ -67,5 +67,12 @@ COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY run_server.sh /run_server.sh
 COPY start.sh /start.sh
 COPY dirsrv-dir /etc/systemctl/dirsrv-dir
+
+RUN dscreate create-template > /tmp/ds.inf && \
+    sed -i -e "s/;root_password = .*/root_password = ${ROOT_PW}/g" \
+      -e "s/;instance_name = .*/instance_name = ${INStANCE_NAME}/g" \
+      -e "s/;suffix = .*/suffix = ${BASEDN}/g" \
+      -e "s/;self_sign_cert = .*/self_sign_cert = False/g" /tmp/ds.inf && \
+    dscreate from-file /tmp/ds.inf
 
 CMD ["/start.sh"]

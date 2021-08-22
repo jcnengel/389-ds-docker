@@ -2,14 +2,14 @@
 #
 # Register default environment
 #
-export DIR_HOSTNAME=${DIR_HOSTNAME:-$(hostname --fqdn)}
+export DIR_HOSTNAME=${DIR_HOSTNAME:-$(hostname -f)}
 export DIR_ADMIN_PASSWORD=${DIR_ADMIN_PASSWORD:-${DIR_MANAGER_PASSWORD:-"Admin123"}}
 export DIR_ADMIN_USERNAME=${DIR_ADMIN_USERNAME:-"bladmin"}
 export DIR_ADMIN_UID=${DIR_ADMIN_UID:-"15000"}
 export DIR_MANAGER_PASSWORD=${DIR_MANAGER_PASSWORD:-${DIR_ADMIN_PASSWORD:-"Admin123"}}
 export DIR_SUFFIX=${DIR_SUFFIX:-"dc=example,dc=com"}
 export DIR_USERS_HOME=${DIR_USERS_HOME:-"/home"}
-export DIR_USERS_SHELL=${DIR_USERS_SHELL:-"/bin/bash"}
+export DIR_USERS_SHELL=${DIR_USERS_SHELL:-"/bin/sh"}
 
 #
 # housekeeping variables
@@ -60,9 +60,9 @@ check_import_certs() {
 # Setup Directory instance
 #
 setup_dirsrv() {
-    /bin/cp -rp /etc/dirsrv-tmpl/* /etc/dirsrv
-    /sbin/setup-ds.pl -s -f /389ds-setup.inf --debug &&
-    /bin/rm -f /389ds-setup.inf
+#    /bin/cp -rp /etc/dirsrv-tmpl/* /etc/dirsrv
+#    /sbin/setup-ds.pl -s -f /389ds-setup.inf --debug &&
+#    /bin/rm -f /389ds-setup.inf
     /bin/mv /certmap.conf ${BASEDIR}
 }
 

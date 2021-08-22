@@ -67,6 +67,7 @@ COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY run_server.sh /run_server.sh
 COPY start.sh /start.sh
 COPY dirsrv-dir /etc/systemctl/dirsrv-dir
+COPY init-users.ldif /init-users.ldif
 
 RUN chmod a+x /start.sh && \
     chmod a+x /run_server.sh && \

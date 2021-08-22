@@ -72,7 +72,7 @@ setup_dirsrv() {
       -e "s/;suffix = .*/suffix = ${BASEDN}/g" \
       -e "s/;self_sign_cert = .*/self_sign_cert = False/g" /tmp/ds.inf
     dscreate from-file /tmp/ds.inf
-    sed -i -e "s/slapd-${INSTANCE_NAME}/slapd-${INSTANCE_NAME}/g" /run_server.sh
+    rm -f /tmp/ds.inf
     /bin/mv /certmap.conf ${BASEDIR}
 }
 

@@ -68,7 +68,9 @@ COPY run_server.sh /run_server.sh
 COPY start.sh /start.sh
 COPY dirsrv-dir /etc/systemctl/dirsrv-dir
 
-RUN dscreate create-template > /tmp/ds.inf && \
+RUN chmod a+x /start.sh && \
+    chmod a+x /run_server.sh && \
+    dscreate create-template > /tmp/ds.inf && \
     sed -i -e "s/;root_password = .*/root_password = ${ROOT_PW}/g" \
       -e "s/;instance_name = .*/instance_name = ${INSTANCE_NAME}/g" \
       -e "s/;suffix = .*/suffix = ${BASEDN}/g" \

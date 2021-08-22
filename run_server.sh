@@ -10,6 +10,9 @@ export DIR_MANAGER_PASSWORD=${DIR_MANAGER_PASSWORD:-${DIR_ADMIN_PASSWORD:-"Admin
 export DIR_SUFFIX=${DIR_SUFFIX:-"dc=example,dc=com"}
 export DIR_USERS_HOME=${DIR_USERS_HOME:-"/home"}
 export DIR_USERS_SHELL=${DIR_USERS_SHELL:-"/bin/sh"}
+export INSTANCE_NAME=${INSTANCE_NAME:-"localhost"}
+export ROOT_PW=${ROOT_PW:-${DIR_ADMIN_PASSWORD}}
+export BASEDN=${BASEDN:-"dc=example,dc=org"}
 
 #
 # housekeeping variables
@@ -63,6 +66,13 @@ setup_dirsrv() {
 #    /bin/cp -rp /etc/dirsrv-tmpl/* /etc/dirsrv
 #    /sbin/setup-ds.pl -s -f /389ds-setup.inf --debug &&
 #    /bin/rm -f /389ds-setup.inf
+    dscreate create-template > /tmp/ds.inf
+    sed -i -e "s/;root_password = .*/root_password = ${ROOT_PW}/g" \
+      -e "s/;instance_name = .*/instance_name = ${INSTANCE_NAME}/g" \
+      -e "s/;suffix = .*/suffix = ${BASEDN}/g" \
+      -e "s/;self_sign_cert = .*/self_sign_cert = False/g" /tmp/ds.inf
+    dscreate from-file /tmp/ds.inf
+    sed -i -e "s/slapd-dir/slapd-${INSTANCE_NAME}/g" /run_server.sh
     /bin/mv /certmap.conf ${BASEDIR}
 }
 
@@ -91,7 +101,7 @@ fi
 #
 if [ ! -d ${BASEDIR} ]; then
     # generate configuration and setup instance
-    /confd -onetime -backend env
+    #/confd -onetime -backend env
     setup_dirsrv       
     check_import_certs
     init_config

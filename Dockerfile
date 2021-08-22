@@ -70,7 +70,7 @@ COPY dirsrv-dir /etc/systemctl/dirsrv-dir
 
 RUN dscreate create-template > /tmp/ds.inf && \
     sed -i -e "s/;root_password = .*/root_password = ${ROOT_PW}/g" \
-      -e "s/;instance_name = .*/instance_name = ${INStANCE_NAME}/g" \
+      -e "s/;instance_name = .*/instance_name = ${INSTANCE_NAME}/g" \
       -e "s/;suffix = .*/suffix = ${BASEDN}/g" \
       -e "s/;self_sign_cert = .*/self_sign_cert = False/g" /tmp/ds.inf && \
     dscreate from-file /tmp/ds.inf
